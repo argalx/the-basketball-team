@@ -6,6 +6,12 @@ conn = sqlite3.connect('the-basketball-team/basket.db')
 # Create cursor object
 cursor = conn.cursor()
 
+# String separator
+separator = "_"*75
+
+# String Divider
+divider = "-"*75
+
 # The Basketball Team Table Creation
 
 # county
@@ -207,4 +213,50 @@ def insertData():
     # Commit Changes
     conn.commit()
 
-insertData()
+# Display Season Details
+def displaySeasonDetails():
+    # Get Season Details
+    cursor.execute('SELECT id, season FROM seasons')
+    seasonDetails = cursor.fetchall()
+
+    for season in seasonDetails:
+        seasonTitle = list(season)[1]
+        seasonId = list(season)[0]
+        
+        # (RMBC) Header
+        print(f'The Richard Michael County Basketball Conference (RMBC) {seasonTitle}\n{separator}\nTEAMS\n{divider}')
+        
+        # Get Teams
+        cursor.execute('SELECT id, team, city_id FROM teams')
+        teamDetails = cursor.fetchall()
+
+        for team in teamDetails:
+            teamName = list(team)[1]
+            print(teamName)
+
+        # Invoke separator variable
+        print(f'{separator}\nMATCHES\n{divider}')
+
+        # Get Season Games
+        cursor.execute('SELECT game, home_id, visitor_id FROM games WHERE season_id=?',(seasonId,))
+        gameDetails = cursor.fetchall()
+        
+        for game in gameDetails:
+            # Get Home Team
+            for team in teamDetails:
+                if list(team)[0] == list(game)[1]:
+                    homeTeam = list(team)[1]
+
+            # Get Visitor Team
+            for team in teamDetails:
+                if list(team)[0] == list(game)[2]:
+                    visitorTeam = list(team)[1]
+
+            print(f'{list(game)[0]}: {homeTeam} (HOME) vs. {visitorTeam} (Visitor)')
+
+
+# Call insertData() Function
+# insertData()
+
+# Call displaySeasonDetails() Function
+displaySeasonDetails()
