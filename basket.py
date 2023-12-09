@@ -319,7 +319,7 @@ def displayTeamDetails():
 # insertData()
 
 # Call displaySeasonDetails() Function
-# displaySeasonDetails()
+displaySeasonDetails()
 
 # Call displayTeamDetails() Function
 displayTeamDetails()
