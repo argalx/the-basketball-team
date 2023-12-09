@@ -254,9 +254,72 @@ def displaySeasonDetails():
 
             print(f'{list(game)[0]}: {homeTeam} (HOME) vs. {visitorTeam} (Visitor)')
 
+# Display Team Details
+def displayTeamDetails():
+    # Get Teams
+    cursor.execute('SELECT id, team, city_id FROM teams')
+    teamDetails = cursor.fetchall()
+    
+    for team in teamDetails:
+        # Get City
+        cursor.execute('SELECT city, county_id FROM city WHERE id=?',(list(team)[2],))
+        cityDetails = cursor.fetchall()
+        city = list(cityDetails[0])[0]
+
+        # Get County
+        cursor.execute('SELECT county FROM county WHERE id=?',(list(cityDetails[0])[1],))
+        countyDetails = cursor.fetchall()
+        county = list(countyDetails[0])[0]
+
+        # Display Team Details
+        print(f'TEAM DETAILS\n{divider}\nTeam: {list(team)[1]}\nCity: {city}\nCounty: {county}\n{separator}\nCOACHING STAFF\n{divider}')
+        
+        # Get Coaches
+        cursor.execute('''SELECT coach_type.coach_type, coaches.coach_name
+                       FROM coaches
+                       INNER JOIN coach_type ON coaches.coach_type_id = coach_type.id WHERE team_id=?''',(list(team)[2],))
+        coachDetails = cursor.fetchall()
+
+        for coach in coachDetails:
+            print(f'{list(coach)[0]}: {list(coach)[1]}')
+
+        # Separator
+        print(f'{separator}\nROSTER\n{divider}')
+
+        # Get Players
+        cursor.execute('SELECT player_name FROM players WHERE team_id=?',(list(team)[2],))
+        playerDetails = cursor.fetchall()
+
+        for player in playerDetails:
+            print(list(player)[0])
+
+        # Separator
+        print(f'{separator}\nUPCOMING MATCHES\n{divider}')
+
+        # Get Games
+        cursor.execute('SELECT game, home_id, visitor_id FROM games WHERE home_id=? OR visitor_id=?',(list(team)[2],list(team)[2],))
+        gameDetails = cursor.fetchall()
+
+        for game in gameDetails:
+            if list(game)[1] == list(team)[2]:
+                # Get Enemy Team
+                cursor.execute('SELECT team FROM teams WHERE id=?',(list(game)[2],))
+                enemyDetails = cursor.fetchall()
+                enemy = list(enemyDetails[0])[0]
+                print(f'{list(game)[0]} - vs. {enemy} (HOME)')
+            else:
+                cursor.execute('SELECT team FROM teams WHERE id=?',(list(game)[1],))
+                enemyDetails = cursor.fetchall()
+                enemy = list(enemyDetails[0])[0]
+                print(f'{list(game)[0]} - vs. {enemy} (AWAY)')
+
+        print(separator)
 
 # Call insertData() Function
 # insertData()
 
 # Call displaySeasonDetails() Function
-displaySeasonDetails()
+# displaySeasonDetails()
+
+# Call displayTeamDetails() Function
+displayTeamDetails()
